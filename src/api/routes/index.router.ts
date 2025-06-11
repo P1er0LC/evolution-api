@@ -69,9 +69,23 @@ router
       documentation: `https://doc.evolution-api.com`,
     });
   })*/
-  .get('/', (_, res) => {
+  .get('/', (req, res) => {
+  
+  const acceptHeader = req.headers.accept || '';
+  
+  if (acceptHeader.includes('text/html')) {
     res.redirect('/manager');
-  })
+  } else {
+    res.status(HttpStatus.OK).json({
+      status: HttpStatus.OK,
+      message: 'Welcome to the Evolution API, it is working!',
+      version: packageJson.version,
+      clientName: process.env.DATABASE_CONNECTION_CLIENT_NAME,
+      manager: !serverConfig.DISABLE_MANAGER ? `${req.protocol}://${req.get('host')}/manager` : undefined,
+      documentation: `https://doc.evolution-api.com`,
+    });
+  }
+})
   .post('/verify-creds', authGuard['apikey'], async (req, res) => {
     return res.status(HttpStatus.OK).json({
       status: HttpStatus.OK,
